@@ -10,7 +10,6 @@
 
 이러한 문제를 해결하기 위해 현대적인 언어는 자동 메모리 관리를 갖추게 되었습니다. 
 
-
 # Python의 메모리 할당
 * Pytho의 메모리에는 크게 4개 구조가 있습니다.
   * 코드 영역 : 프로그램 실행할 코드를 저장
@@ -122,7 +121,37 @@ Reference count가 2인걸 알 수 있습니다. 1은 처음 객체가 a 에 할
 * 객체 수가 해당 임계값을 초과하면 가비지 콜렉션이 콜렉션 프로세스를 trigger(추적) 합니다.
 * 해상 프로세스에서 살아남은 객체는 이전 세대로 옮겨집니다.
 
-# Pytho의 메모리 관리
+가비지 컬렉터는 내부적으로 generation(세대)과 threshold(임계값)로 가비지 컬렉션 주기와 객체를 관리합니다. 세대는 0~2세대로 구분되고 최근 생성된 객체는 0세대(young)에 들어가고 오래된 객체일수록 2세대(old)로 이동합니다. 당연히 한 객체는 단 하나의 세대에만 속합니다. 
+
+Generational Garbage Collection은 GC module의 get_threshold() method를 사용하여 구성된 임계값을 확인할 수 있습니다.
+
+    >>> import gc
+    >>> gc.get_threshold()
+    (700, 10, 10)
+
+각각 threshold 0, threshold 1, threshold 2를 의미하는데 n세대에 객체를 할당한 횟수가 threshold n을 초과하면 가비지 컬렉션이 수행됩니다.
+
+또한 get_count() method를 사용하여 각 세대의 객체 수를 확인할 수 있습니다.
+
+    >>> import gc
+    >>> gc.get_count()
+    (121, 9, 2)
+
+(위 값은 method를 호출할 때마다 변경됩니다.) 위 코드에서는 youngest generation(가장 어린 세대)에 121개의 객체, 다음 세대에 9개의 객체 oldest generation(가장 오래된 세대)에 2개의 객체가 있는 것을 알 수 있습니다.
+
+gc module에서 set_threshold() method를 사용하여 가비지 컬렉션 트리거 임계값을 변경할 수 있습니다.
+
+    >>> import gc
+    >>> gc.get_threshold()
+    (700, 10, 10)
+    >>> gc.set_threshold
+    (1000, 15, 15)
+    >>> gc.get_threshold()
+    (1000, 15, 15)
+
+임계 값을 증가시키면 가비지 컬렉션이 실행되는 빈도가 줄어들며 죽은 객체를 오래 유지하는 cost(비용)로 프로그램에서 계산 비용이 줄어듭니다.
+
+# Pytho의 메모리 관리 요약
 * Pytho은 동적 메모리 할당을 기본으로 합니다.
 * 즉, 프로그래머가 직접 관리하는게 아니라 reference count와 garbage collection으로 메모리 관리가 된다는 뜻입니다.
   * 객체가 생성되면, Pytho은 객체를 메모리와 세대 0에 assign합니다.
@@ -131,9 +160,13 @@ Reference count가 2인걸 알 수 있습니다. 1은 처음 객체가 a 에 할
   * gc.collect()는 unreachable 객체의 개수를 반환한다. 도달할 수 없는 객체란, 더이상 사용되지 않는 객체를 말한다. 이들은 메모리에서 해제됩니다.
   * reachable 객체는 다음 세대로 이동됩니다.
 
-# 가비지 컬렉션의 단점
-* 가비지 컬렉션을 수행하려면 응용 프로그램을 완전히 중지해야 한다. 그러므로 객체가 많을수록 모든 가비지를 수집하는 데 시간이 오래 걸린다는 것도 분명합니다.
-* 가비지 컬렉션 주기가 짧다면 응용 프로그램이 중지되는 상항이 증가하고 반대로 주기가 길어진다면 메모리 공간에 가비지가 많이 쌓일 것입니다.
+# 예제 코드
+
+
+
+
+
+
 
 ------
 ###### 참고사이트 : https://medium.com/dmsfordsm/garbage-collection-in-python-777916fd3189, https://velog.io/@mquat/OS-Garbage-collector-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%9D%98-Memory-%EC%82%AC%EC%9A%A9
