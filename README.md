@@ -1,27 +1,57 @@
 # 가비지 컬렉션(Garbage-Collection)
 ### 가비지 컬렉션이란 ?
 * 프로그램을 개발 하다 보면 유효하지 않은 메모리인 가비지(Garbage)가 발생하게 되는데 이러한 가비지는 불필요하게 메모리를 점유하게 됩니다. 가비지 컬렉션은 메모리 관리 기법 중 하나로 프로그램이 동적으로 할당했던 메모리 영역 중에서 필요없게 된 영역을 해제하는 기능입니다.
+* Java와 Python의 가비지 컬렉션의 동작 메커니즘에는 차이가 있으나 불필요한 메모리를 제거하는 점은 동일합니다.  
 
 ### 가비지 컬렉션의 필요성
 * 현대적인 언어가 아닌 과거 언어인 경우, 메모리 관리를 직접 해줘야 하는 언어들은 크게 두 가지 문제점을 가지고 있습니다.
 1. 필요 없는 메모리를 비우지 않았을 때 : 메모리 사용을 마쳤을 때 비우지 않을 경우 메모리 누수가 발생할 수 있고 장기적인 관점에서 심각한 문제가 발생할 수 있다.
 2. 사용중인 메모리 비우기 : 존재하지 않는 메모리에 접근하려고 하면 프로그램이 중단되거나 메모리 데이터 값이 손상될 수 있다.
 
-이러한 문제를 해결하기 위해 java, python 등 현대적인 언어는 자동 메모리 관리를 갖추게 되었습니다.
+이러한 문제를 해결하기 위해 현대적인 언어는 자동 메모리 관리를 갖추게 되었습니다. 
 
-# 가비지 컬렉션 메소드
-* 가비지 컬렉션 메소드에는 대표적으로 3가지가 있습니다.
 
-1. Mark and Sweep
-2. Reference count
-3. Generational Garbage Collection
+# Python의 메모리 할당
+* Pytho의 메모리에는 크게 4개 구조가 있습니다.
+  * 코드 영역 : 프로그램 실행할 코드를 저장
+  * 데이터 영역 : 전역변수 등을 저장
+  * 힙 영역(heap) : 동적 할당된 변수나 메소드 저장
+  * 스택 영역 (stack) : 지역변수 등을 저장
 
-### 1. Mark and Sweep(표시하고 쓸기)
-* Mark and Sweep은 각 메모리 영역에 1비트씩 남겨둔 후, 변수가 가리키는 영역과 그 영역이 가리키는 또 다른 영역을 모두 '사용 중'으로 표시합니다. 
-* 이 때 '사용 중'으로 표시되지 않은 나머지 영역을 없애는 기법입니다.
+아래의 코드를 예로 들면,
 
-### 2. Reference count(참조 횟수 계산)
-* 파이썬의 주된 가비지 콜렉션 메커니즘은 Reference count입니다. 파이썬에서 어떤 객체를 생성하면, C  수준 객체는 이 파이썬 객체의 타입과 reference count를 가지고 있게 됩니다.
+        def f2(x):
+        x = x+1
+        return x 
+
+        def f1(x):
+        x = x*2
+        y = f2(x)
+        return y
+
+        #main 
+        y = 5 
+        z = f1(y)
+
+        print(z)
+        >>> 11
+
+* main에서 y=5를 선언했다. 5는 heap영역에, 변수 y는 stack 영역에 저장됩니다.
+* 이어서 선언한 z와 f1() 는 stack영역에 추가되고, f1에 담은 y는 5를 참조합니다. 5는 다시 f1(x)의 x에 전달됩니다.
+* f1(5) 가 실행되면, x=x*2 에 의해 10은 heap영역에 저장되고 x 는 10을 가리킵니다.
+* y=f2(x)가 실행되면, f2()는 stack영역에 저장되고 10을 가리킵니다.
+* x=x+1로 인해 11이 heap영역에 추가되고, x는 11을 가리키게 됩니다.
+* return x로 인해 11이 f1(x)의 y에 담기고, return y로 인해 z에 11이 담깁니다.
+* f1()과 f2()는 stack영역에서 사라집니다.
+
+# python 가비지 컬렉션 메소드
+* python에서의 가비지 컬렉션 메소드에는 대표적으로 2가지가 있습니다.
+
+1. Reference count
+2. Generational Garbage Collection
+
+## 1. Reference count(참조 횟수 계산)
+* Pytho의 주된 가비지 콜렉션 메커니즘은 Reference count입니다. Pytho에서 어떤 객체를 생성하면, C  수준 객체는 이 Pytho 객체의 타입과 reference count를 가지고 있게 됩니다.
   * reference count는 객체가 참조될 때마다 +1, 해제될 때 -1로 계산됩니다. 이렇게 각 객체의 참조 횟수를 count하여 0이 되면 해당 객체를 해제하는 방식을 말합니다.
   * 이때 객체의 카운트가 0이라는 뜻은 더이상 이 객체에 접근하고 있는 코드가 없다는 의미이므로 메모리에서 삭제, 즉 할당 해제(deallocation)를 할 수 있게 되고, 바로 이 때 객체가 지워지게 됩니다. 따라서 안전하게 해당 메모리를 "즉시" 확보 가능합니다.
 
@@ -78,7 +108,7 @@ Reference count가 2인걸 알 수 있습니다. 1은 처음 객체가 a 에 할
 
 이러한 유형의 문제를 reference cycle(참조 주기)이라고 하며 reference counting으로 해결할 수 없습니다.
 
-### 3. Generational Garbage Collection(세대 단위 쓰레기 수집)
+## 2. Generational Garbage Collection(세대 단위 쓰레기 수집)
 * Generational Garbage Collection에는 두가지 핵심이 있습니다.
 
 1. 세대(generation)
@@ -92,13 +122,18 @@ Reference count가 2인걸 알 수 있습니다. 1은 처음 객체가 a 에 할
 * 객체 수가 해당 임계값을 초과하면 가비지 콜렉션이 콜렉션 프로세스를 trigger(추적) 합니다.
 * 해상 프로세스에서 살아남은 객체는 이전 세대로 옮겨집니다.
 
-
-
-
+# Pytho의 메모리 관리
+* Pytho은 동적 메모리 할당을 기본으로 합니다.
+* 즉, 프로그래머가 직접 관리하는게 아니라 reference count와 garbage collection으로 메모리 관리가 된다는 뜻입니다.
+  * 객체가 생성되면, Pytho은 객체를 메모리와 세대 0에 assign합니다.
+  * 임계치를 오버하는 경우, collect_generations()를 실행한다. 2세대부터 역순으로 검사합니다.
+  * 객체 수가 임계치를 넘으면 gc.collect()를 실행해 garbage collection process를 수행합니다.
+  * gc.collect()는 unreachable 객체의 개수를 반환한다. 도달할 수 없는 객체란, 더이상 사용되지 않는 객체를 말한다. 이들은 메모리에서 해제됩니다.
+  * reachable 객체는 다음 세대로 이동됩니다.
 
 # 가비지 컬렉션의 단점
 * 가비지 컬렉션을 수행하려면 응용 프로그램을 완전히 중지해야 한다. 그러므로 객체가 많을수록 모든 가비지를 수집하는 데 시간이 오래 걸린다는 것도 분명합니다.
 * 가비지 컬렉션 주기가 짧다면 응용 프로그램이 중지되는 상항이 증가하고 반대로 주기가 길어진다면 메모리 공간에 가비지가 많이 쌓일 것입니다.
 
 ------
-###### 참고사이트 : https://medium.com/dmsfordsm/garbage-collection-in-python-777916fd3189, 
+###### 참고사이트 : https://medium.com/dmsfordsm/garbage-collection-in-python-777916fd3189, https://velog.io/@mquat/OS-Garbage-collector-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%9D%98-Memory-%EC%82%AC%EC%9A%A9
