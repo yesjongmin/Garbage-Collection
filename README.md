@@ -198,14 +198,6 @@ gc module에서 set_threshold() method를 사용하여 가비지 컬렉션 트�
     del a
     del b
 
-
-
-
-
-
-
-
-
 * 전역 변수 (Global variables)
 
       my_list = []
@@ -216,13 +208,16 @@ gc module에서 set_threshold() method를 사용하여 가비지 컬렉션 트�
 위 예제에서는 my_list가 전역 변수로 선언되었고, 함수 add_to_list를 통해 요소가 추가됩니다.
 하지만 리스트가 계속해서 커지면서 메모리를 계속해서 차지하게 되고, 이는 메모리 누수로 이어질 수 있습니다.
 
+이러한 문제를 해결하기 위해서는 전역 변수(Global variables)를 최소화하고, 필요한 경우에는 클래스나 함수 내에 지역 변수(Local variables)로 사용합니다. 지역 변수는 해당 함수나 클래스의 실행이 완료될 때 함께 사라지므로 메모리 누수를 방지할 수 있습니다.
 
 
+    def process_data(data):
+    local_list = []
+    local_list.append(data)
+    # 데이터 처리 로직
 
 
-
-
-
+위의 코드와 같이 전역 변수 대신 지역 변수인 local_list를 사용하여 메모리 누수를 방지합니다.
 
 ------
-###### 참고사이트 : https://medium.com/dmsfordsm/garbage-collection-in-python-777916fd3189, https://velog.io/@mquat/OS-Garbage-collector-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%9D%98-Memory-%EC%82%AC%EC%9A%A9
+###### 참고사이트 : https://medium.com/dmsfordsm/garbage-collection-in-python-777916fd3189, https://velog.io/@mquat/OS-Garbage-collector-%EA%B7%B8%EB%A6%AC%EA%B3%A0-%ED%8C%8C%EC%9D%B4%EC%8D%AC%EC%9D%98-Memory-%EC%82%AC%EC%9A%A9, https://openai.com/product/gpt-4
