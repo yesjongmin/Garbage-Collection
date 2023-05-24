@@ -160,7 +160,7 @@ gc module에서 set_threshold() method를 사용하여 가비지 컬렉션 트�
   * gc.collect()는 unreachable 객체의 개수를 반환한다. 도달할 수 없는 객체란, 더이상 사용되지 않는 객체를 말한다. 이들은 메모리에서 해제됩니다.
   * reachable 객체는 다음 세대로 이동됩니다.
 
-# 예제 코드
+# Memory Leak
 * Python은 가비지 컬렉션 기능을 내장하고 있어 일반적으로 메모리 관리에 크게 신경쓰지 않아도 되지만, 몇 가지 경우에는 메모리 누수(Memory Leak)가 발생할 수 있습니다. 
 
 * 순환 참조 (Circular reference)
